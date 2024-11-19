@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import connect from "@/lib/db";
 import { Types } from "mongoose";
 
-const ObjectId = require("mongoose").Types.ObjectId ;
+const ObjectId = Types.ObjectId;
 
 export const GET = async () => {
     try {
@@ -37,49 +37,52 @@ export const POST = async (request: Request) => {
     }
 };
 
-export const PATCH  = async (request :Request) => {
+export const PATCH = async (request: Request) => {
     try {
-        const body = await request.json() ;
-        const {userId ,newUsername} = body ;
+        const body = await request.json();
+        const { userId, newUsername } = body;
+
         await connect();
-        if(!userId || !newUsername) {
-            return new NextResponse(
-                JSON.stringify({message : "ID or new username not found"}) ,
-                {status :400}
-            )
+
+        if (!userId || !newUsername) {
+            return NextResponse.json(
+                { message: "ID or new username not found" },
+                { status: 400 }
+            );
         }
 
-        if(!Types.ObjectId.isValid(userId)) {
-            return new NextResponse(
-                JSON.stringify({message : "ID or new username not found"}) ,
-                {status :400}
-            )
-
+        if (!Types.ObjectId.isValid(userId)) {
+            return NextResponse.json(
+                { message: "Invalid User ID" },
+                { status: 400 }
+            );
         }
 
         const updateUser = await User.findOneAndUpdate(
-            {_id: new ObjectId(userId)} ,
-            {username :newUsername} ,
-            {new:true} ,
-        ) ;
+            { _id: new ObjectId(userId) },
+            { username: newUsername },
+            { new: true }
+        );
 
-        if(!updateUser) {
-            return new NextResponse(
-                JSON.stringify({message :"User not found in the database"}) ,
-                {status :400}
-            )
+        if (!updateUser) {
+            return NextResponse.json(
+                { message: "User not found in the database" },
+                { status: 400 }
+            );
         }
 
-        return new NextResponse(
-            JSON.stringify({message : "User is updated" ,user :updateUser}) ,
-            {status :200}
-        )
+        return NextResponse.json(
+            { message: "User is updated", user: updateUser },
+            { status: 200 }
+        );
 
-    }catch (error : any) {
-        return new NextResponse("Error in updating user" ,error.message) ,{status :500}
-
+    } catch (error: any) {
+        return NextResponse.json(
+            { error: "Error in updating user", message: error.message },
+            { status: 500 }
+        );
     }
-}
+};
 
 
 export const DELETE = async (request : Request) => {

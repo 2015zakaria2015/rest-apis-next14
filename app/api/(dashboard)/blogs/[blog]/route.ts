@@ -4,7 +4,6 @@ import connect from "@/lib/db";
 import { Types } from "mongoose";
 import Category from "@/lib/modals/category";
 import Blog from "@/lib/modals/blog";
-import { error } from "console";
 
 export const GET = async (request: Request, context: { params: any }) => {
   const blogId = context.params.blog;
